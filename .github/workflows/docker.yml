@@ -1,0 +1,62 @@
+name: Docker
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  Build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: 'adopt' # https://github.com/actions/setup-java#basic-configuration
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew bootJar
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./*/*/*.jar
+          name: app
+          if-no-files-found: error
+
+  Docker:
+    runs-on: ubuntu-22.04
+    needs: Build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: app
+
+      - name: Login to Docker Registry
+        run: |
+          export CR_PAT=${{ secrets.GITHUB_TOKEN }}
+          echo $CR_PAT | docker login ghcr.io -u ${{ vars.CONTAINER_REGISTRY_USERNAME }} --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build --build-arg JAR_FILE='*.jar' -t ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.release.name }} .
+
+      - name: Aqua Trivy (Container Image Scan)
+        uses: aquasecurity/trivy-action@0.14.0
+        with:
+          image-ref: 'ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.release.name }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Push Docker Image to Registry
+        run: |
+          docker push ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.release.name }}

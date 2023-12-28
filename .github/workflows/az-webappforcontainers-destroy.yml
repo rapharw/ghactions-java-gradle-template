@@ -1,0 +1,61 @@
+name: Destroy Azure App Service (Web App for Containers)
+
+on:
+  workflow_dispatch:
+    inputs:
+      AZURE_RG:
+        description: 'Azure Resource Group'
+        required: true
+      AZURE_ASP_NAME:
+        description: 'Azure App Service Plan Name'
+        required: true
+      AZURE_ASP_SKU_SIZE:
+        description: 'Azure App Service Plan SKU Size'
+        required: true
+      AZURE_APP_NAME:
+        description: 'Azure App Service Name (Web App)'
+        required: true
+      CONTAINER_IMAGE_TAG:
+        description: 'Container Image Tag'
+        required: true
+
+jobs:
+  DestroyAzureAppServiceWebAppForContainers:
+    runs-on: ubuntu-22.04
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+      TF_VAR_AZURE_LOCATION: ${{ vars.AZURE_LOCATION}}
+      TF_VAR_AZURE_RG: ${{ github.event.inputs.AZURE_RG }}
+      TF_VAR_AZURE_SA_NAME: ${{ github.event.inputs.AZURE_SA_NAME }}
+      TF_VAR_AZURE_SA_CONTAINER_NAME: ${{ github.event.inputs.AZURE_SA_CONTAINER_NAME }}
+      TF_VAR_AZURE_ASP_NAME: ${{ github.event.inputs.AZURE_ASP_NAME }}
+      TF_VAR_AZURE_ASP_SO: ${{ vars.AZURE_ASP_SO }}
+      TF_VAR_AZURE_ASP_SKU_SIZE: ${{ github.event.inputs.AZURE_ASP_SKU_SIZE }}
+      TF_VAR_AZURE_APP_NAME: ${{ github.event.inputs.AZURE_APP_NAME }}
+      TF_VAR_CONTAINER_REGISTRY_USERNAME: ${{ vars.CONTAINER_REGISTRY_USERNAME }}
+      TF_VAR_CONTAINER_REGISTRY_REPO_NAME: ${{ vars.CONTAINER_REGISTRY_REPO_NAME }}
+      TF_VAR_CONTAINER_IMAGE_TAG: ${{ github.event.inputs.CONTAINER_IMAGE_TAG }}
+      TF_VAR_CONTAINER_REGISTRY_TOKEN: ${{ secrets.CONTAINER_REGISTRY_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure CLI configure
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+            az account set --subscription $ARM_SUBSCRIPTION_ID
+            az account show   
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve
