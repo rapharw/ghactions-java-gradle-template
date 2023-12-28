@@ -85,11 +85,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: app
-
       - name: Login to dockerhub
         run: |
-          export CR_PAT=${{ secrets.CONTAINER_REGISTRY_TOKEN }}
-          echo $CR_PAT | docker login -u ${{ vars.CONTAINER_REGISTRY_USERNAME }} --password-stdin
+          export CR_PAT=${{ secrets.DOCKERHUB_TOKEN }}
+          echo $CR_PAT | docker login -u ${{ vars.CONTAINER_REGISTRY_USERNAME }} --password-stdin 'docker.io'
 
       - name: Build Docker Image
         run: |
@@ -124,7 +123,7 @@ jobs:
       - name: Login to ACR
         if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'azurecr.io' }}
         run: |
-          export CR_PAT=${{ secrets.CONTAINER_REGISTRY_TOKEN }}
+          export CR_PAT=${{ secrets.AZ_CONTAINER_REGISTRY_TOKEN }}
           echo $CR_PAT | docker login ${{ vars.AZURE_REGISTRY_NAME}}.azurecr.io -u ${{ vars.CONTAINER_REGISTRY_USERNAME }} --password-stdin
 
       - name: Build Docker Image
