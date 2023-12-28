@@ -6,7 +6,7 @@ on:
       CONTAINER_REGISTRY_SELECTED:
         description: 'Select Container Registry'
         required: true
-        default: 'ghcr.io'
+        type: choice
         options:
           - 'ghcr.io'
           - 'dockerhub'
