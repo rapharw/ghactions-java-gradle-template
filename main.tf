@@ -72,6 +72,12 @@ resource "azurerm_linux_web_app" "app_service" {
     app_command_line       = ""
     remote_debugging_enabled = false
 
+    app_settings = {
+      "DOCKER_REGISTRY_SERVER_URL"      = "https://ghcr.io"
+      "DOCKER_REGISTRY_SERVER_USERNAME" = var.CONTAINER_REGISTRY_USERNAME
+      "DOCKER_REGISTRY_SERVER_PASSWORD" = var.CONTAINER_REGISTRY_TOKEN
+    }
+
     application_stack {
       docker_registry_url = "https://ghcr.io"
       docker_image_name = "${var.CONTAINER_REGISTRY_USERNAME}/${var.CONTAINER_REGISTRY_REPO_NAME}:${var.CONTAINER_IMAGE_TAG}"
