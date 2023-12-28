@@ -103,6 +103,10 @@ Arquivo `sonarqube.yml`
 
 **OBS:** Criar as variáveis de ambiente `CONTAINER_REGISTRY_USERNAME` e `CONTAINER_REGISTRY_REPO_NAME` no repositório
 
+#### Habilitar Workflow Permissions
+
+![docker-workflow-permissions.png](./screenshots/docker-workflow-permissions.png)
+
 ### Terraform (Criar e Destruir Azure Web App for Containers)
 
 
