@@ -74,9 +74,7 @@ resource "azurerm_linux_web_app" "app_service" {
 
     application_stack {
       docker_registry_url = "https://ghcr.io"
-      docker_image_name = "${var.CONTAINER_REGISTRY_USERNAME}/${var.CONTAINER_REGISTRY_REPO_NAME}"
-      docker_image = "ghcr.io/${var.CONTAINER_REGISTRY_USERNAME}/${var.CONTAINER_REGISTRY_REPO_NAME}"
-      docker_image_tag = var.CONTAINER_IMAGE_TAG
+      docker_image_name = "${var.CONTAINER_REGISTRY_USERNAME}/${var.CONTAINER_REGISTRY_REPO_NAME}:${var.CONTAINER_IMAGE_TAG}"
       docker_registry_username = var.CONTAINER_REGISTRY_USERNAME
       docker_registry_password = var.CONTAINER_REGISTRY_TOKEN
     }
