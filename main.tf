@@ -65,18 +65,15 @@ resource "azurerm_linux_web_app" "app_service" {
 
   app_settings = {
     "WEBSITES_PORT" = "8080"
+    "DOCKER_REGISTRY_SERVER_URL"      = "https://ghcr.io"
+    "DOCKER_REGISTRY_SERVER_USERNAME" = var.CONTAINER_REGISTRY_USERNAME
+    "DOCKER_REGISTRY_SERVER_PASSWORD" = var.CONTAINER_REGISTRY_TOKEN
   }
 
   site_config {
     always_on              = true
     app_command_line       = ""
     remote_debugging_enabled = false
-
-    app_settings = {
-      "DOCKER_REGISTRY_SERVER_URL"      = "https://ghcr.io"
-      "DOCKER_REGISTRY_SERVER_USERNAME" = var.CONTAINER_REGISTRY_USERNAME
-      "DOCKER_REGISTRY_SERVER_PASSWORD" = var.CONTAINER_REGISTRY_TOKEN
-    }
 
     application_stack {
       docker_registry_url = "https://ghcr.io"
