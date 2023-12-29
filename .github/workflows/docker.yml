@@ -51,6 +51,9 @@ jobs:
         with:
           name: app
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to ghcr.io
         run: |
           export CR_PAT=${{ secrets.GITHUB_TOKEN }}
@@ -64,11 +67,27 @@ jobs:
         uses: aquasecurity/trivy-action@0.14.0
         with:
           image-ref: 'ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
-          format: 'table'
+          scan-type: 'image'
+          format: 'json'
+          output: 'trivy-report.json'
           exit-code: '1'
           ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          vuln-type: 'os'
+
+      - name: Check Vuln Count
+        run: |
+          report_file="trivy-report.json"
+          vuln_count=$(jq '.Results | length' "$report_file")
+          echo "vuln_count=$vuln_count" >> $GITHUB_OUTPUT
+
+      - name: Copa Action
+        uses: project-copacetic/copa-action@v1
+        with:
+          image: 'ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
+          image-report: 'trivy-report.json'
+          patched-tag: '${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
+          buildkit-version: 'v0.11.6'
+          copa-version: '0.4.1'
 
       - name: Push Docker Image to Registry
         run: |
