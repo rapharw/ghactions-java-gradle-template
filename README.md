@@ -4,7 +4,7 @@ Template Java Gradle para GitHub Actions, com as configurações de:
 - Build
 - Testes com Coverage
 - Análise de SonarQube
-- Docker (build, trivy scan, push - "ghcr.io")
+- Docker (build, trivy scan, push) - _ghcr.io, dockerhub, azurecr.io_
 - Terraform (Azure Web App for Containers)
 
 A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-and-play com a pipeline descrita anteriormente.
@@ -26,7 +26,7 @@ A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-
 
 [![Create Azure App Service (Web App for Containers)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create.yml)
 
-[![Create Azure App Service (Web App for Containers)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create.yml)
+[![Destroy Azure App Service (Web App for Containers)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-destroy.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-destroy.yml)
 
 # Tecnologias
 
@@ -48,26 +48,9 @@ Criar as seguintes Secrets e Variables no GitHub:
 
 ![secrets.png](screenshots/secrets.png)
 
-```properties
-AZURE_CLIENT_ID=<your-service-principal-client-id>
-AZURE_CLIENT_SECRET=<your-service-principal-client-secret>
-AZURE_SUBSCRIPTION_ID=<your-subscription-id>
-AZURE_TENANT_ID=<your-azure-tenant-id>
-CONTAINER_REGISTRY_TOKEN=<container-registry-token>
-SONARQUBE_API_TOKEN=<sonarqube-token>
-SONARQUBE_HOST=<sonarqube-host>
-```
-
 ![variables.png](screenshots/variables.png)
 
-```properties
-AZURE_ASP_SO=<your-app-service-plan-so>
-AZURE_LOCATION=<your-azure-location-name>
-CONTAINER_REGISTRY_REPO_NAME=<container-registry-repository-name>
-CONTAINER_REGISTRY_USERNAME=<container-registry-username>
-```
-
-**OBS**: Desta forma, a solução estará apta a executar o fluxo de pipeline proposto.
+**OBS**: Desta forma, a solução estará apta a executar todo fluxo de pipeline proposto.
 
 ## Workflows
 
@@ -97,11 +80,16 @@ Arquivo `sonarqube.yml`
 - Secrets configuradas (`SONARQUBE_API_TOKEN`, `SONARQUBE_HOST`)
 - Arquivo `sonar-project.properties` configurado
 
-### Build e Docker (Login, Build, Scan - _Aqua Trivy_, e Push to GHCR)
+### Build e Docker (Login, Build, Scan - _Aqua Trivy_, e Push)
 
-**Este exemplo utiliza `CONTAINER REGISTRY` do GitHub (`ghcr`)**, para armazenamento das imagens de container
+Este exemplo utiliza `CONTAINER REGISTRY` dos providers abaixo, para armazenamento das imagens de container:
 
-**OBS:** Criar as variáveis de ambiente `CONTAINER_REGISTRY_USERNAME` e `CONTAINER_REGISTRY_REPO_NAME` no repositório
+- GitHub (`ghcr.io`)
+   ![container-registry-github.png](./screenshots/container-registry-github.png)
+- DockerHub (`docker.io`)
+   ![container-registry-dockerhub.png](./screenshots/container-registry-dockerhub.png)
+- Azure (`azurecr.io`)
+   ![container-registry-acr.png](./screenshots/container-registry-acr.png)
 
 #### Habilitar Workflow Permissions
 
@@ -109,11 +97,14 @@ Arquivo `sonarqube.yml`
 
 ### Terraform (Criar e Destruir Azure Web App for Containers)
 
+Para executar o workflow de criação IaC, informar os seguintes inputs:
+
+![workflow-tf-azure.png](./screenshots/workflow-tf-azure.png)
 
 
-## GitHub Actions (Status Badge)
+## Status Badge (workflows)
 
-Para criar um status badge, siga os passos abaixo, e inclua o código gerado no seu `README.md`, na seção `[Ir para Seção de Exemplo](#status)`
+Para criar um status badge, siga os passos abaixo, e inclua o código gerado no seu `README.md`
 
 1. Crie uma status badge
 
