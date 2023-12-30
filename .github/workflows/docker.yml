@@ -119,11 +119,11 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build --build-arg JAR_FILE='*.jar' -t ${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }} .
+          docker build --build-arg JAR_FILE='*.jar' -t '${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}' .
 
       - name: Push Docker Image to Registry
         run: |
-          docker push ${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}
+          docker push '${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
 
       - name: Aqua Trivy (Container Image Scan)
         uses: aquasecurity/trivy-action@0.14.0
@@ -153,7 +153,7 @@ jobs:
 
       - name: Push Docker Image Patched to Registry
         run: |
-          docker push ${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}-patched
+          docker push '${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}-patched'
 
   AzureContainerRegistry:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'azurecr.io' }}
@@ -177,11 +177,11 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build --build-arg JAR_FILE='*.jar' -t ${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io/${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }} .
+          docker build --build-arg JAR_FILE='*.jar' -t '${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io/${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}' .
 
       - name: Push Docker Image to Registry
         run: |
-          docker push ${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}
+          docker push '${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
 
       - name: Aqua Trivy (Container Image Scan)
         uses: aquasecurity/trivy-action@0.14.0
@@ -211,4 +211,4 @@ jobs:
 
       - name: Push Docker Image Patched to Registry
         run: |
-          docker push ${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io/${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}-patched
+          docker push '${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io/${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}-patched'
