@@ -181,7 +181,7 @@ jobs:
 
       - name: Push Docker Image to Registry
         run: |
-          docker push '${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
+          docker push '${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io/${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
 
       - name: Aqua Trivy (Container Image Scan)
         uses: aquasecurity/trivy-action@0.14.0
