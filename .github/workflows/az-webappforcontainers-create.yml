@@ -79,10 +79,14 @@ jobs:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'ghcr.io' }}
     runs-on: ubuntu-22.04
     steps:
-      - name: Login Azure CLI
-        uses: azure/login@v1
+      - name: Azure CLI configure
+        uses: azure/CLI@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          azcliversion: 2.30.0
+          inlineScript: |
+            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+            az account set --subscription $ARM_SUBSCRIPTION_ID
+            az account show
 
       - name: Login to ghcr.io
         run: |
@@ -99,10 +103,14 @@ jobs:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'dockerhub' }}
     runs-on: ubuntu-22.04
     steps:
-      - name: Login Azure CLI
-        uses: azure/login@v1
+      - name: Azure CLI configure
+        uses: azure/CLI@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          azcliversion: 2.30.0
+          inlineScript: |
+            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+            az account set --subscription $ARM_SUBSCRIPTION_ID
+            az account show
 
       - name: Login to dockerhub
         run: |
@@ -119,10 +127,14 @@ jobs:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'azurecr.io' }}
     runs-on: ubuntu-22.04
     steps:
-      - name: Login Azure CLI
-        uses: azure/login@v1
+      - name: Azure CLI configure
+        uses: azure/CLI@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          azcliversion: 2.30.0
+          inlineScript: |
+            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+            az account set --subscription $ARM_SUBSCRIPTION_ID
+            az account show
 
       - name: Login to ACR
         run: |
