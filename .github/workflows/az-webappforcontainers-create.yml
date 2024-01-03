@@ -82,6 +82,11 @@ jobs:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'ghcr.io' }}
     runs-on: ubuntu-22.04
     steps:
+      - name: Login Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Login to ghcr.io
         run: |
           export CR_PAT=${{ secrets.GITHUB_TOKEN }}
@@ -97,6 +102,11 @@ jobs:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'dockerhub' }}
     runs-on: ubuntu-22.04
     steps:
+      - name: Login Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Login to dockerhub
         run: |
           export CR_PAT=${{ secrets.DOCKERHUB_TOKEN }}
@@ -112,6 +122,11 @@ jobs:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'azurecr.io' }}
     runs-on: ubuntu-22.04
     steps:
+      - name: Login Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Login to ACR
         run: |
           export CR_PAT=${{ secrets.AZURE_CONTAINER_REGISTRY_TOKEN }}
