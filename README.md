@@ -52,6 +52,10 @@ Criar as seguintes Secrets e Variables no GitHub:
 
 **OBS**: Desta forma, a solução estará apta a executar todo fluxo de pipeline proposto.
 
+## SonarQube
+
+Configurar o `SONARQUBE_HOST` e `SONARQUBE_API_TOKEN` habilitará a aplicação de submeter para scan de anáise de código.
+
 ## Workflows
 
 **OBS**: Para criar um novo workflow, basta criar um arquivo `.yml` na pasta `.github/workflows/` do seu repositório, e configurá-lo apropriadamente.
