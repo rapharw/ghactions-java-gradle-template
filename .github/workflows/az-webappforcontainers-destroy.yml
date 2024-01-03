@@ -15,9 +15,6 @@ on:
       AZURE_APP_NAME:
         description: 'Azure App Service Name (Web App)'
         required: true
-      CONTAINER_IMAGE_TAG:
-        description: 'Container Image Tag'
-        required: true
 
 jobs:
   DestroyAzureAppServiceWebAppForContainers:
@@ -36,11 +33,7 @@ jobs:
       TF_VAR_AZURE_ASP_SO: ${{ vars.AZURE_ASP_SO }}
       TF_VAR_AZURE_ASP_SKU_SIZE: ${{ github.event.inputs.AZURE_ASP_SKU_SIZE }}
       TF_VAR_AZURE_APP_NAME: ${{ github.event.inputs.AZURE_APP_NAME }}
-      TF_VAR_CONTAINER_REGISTRY_USERNAME: ${{ vars.CONTAINER_REGISTRY_USERNAME }}
-      TF_VAR_CONTAINER_REGISTRY_REPO_NAME: ${{ vars.CONTAINER_REGISTRY_REPO_NAME }}
-      TF_VAR_CONTAINER_IMAGE_TAG: ${{ github.event.inputs.CONTAINER_IMAGE_TAG }}
-      TF_VAR_CONTAINER_REGISTRY_TOKEN: ${{ secrets.CONTAINER_REGISTRY_TOKEN }}
-
+      
     steps:
       - name: Checkout
         uses: actions/checkout@v4

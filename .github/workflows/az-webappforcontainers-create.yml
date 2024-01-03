@@ -15,9 +15,6 @@ on:
       AZURE_APP_NAME:
         description: 'Azure App Service Name (Web App)'
         required: true
-      CONTAINER_IMAGE_TAG:
-        description: 'Container Image Tag'
-        required: true
       CONTAINER_REGISTRY_SELECTED:
         description: 'Select Container Registry'
         required: true
@@ -26,6 +23,10 @@ on:
           - 'ghcr.io'
           - 'dockerhub'
           - 'azurecr.io'
+      CONTAINER_IMAGE_TAG:
+        description: 'Container Image Tag'
+        required: true
+
 
 jobs:
   CreateAzureAppServiceWebAppForContainers:
