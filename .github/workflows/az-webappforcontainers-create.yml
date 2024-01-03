@@ -78,21 +78,12 @@ jobs:
     needs: CreateAzureAppServiceWebAppForContainers
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'ghcr.io' }}
     runs-on: ubuntu-22.04
-    env:
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
     steps:
-      - name: Azure CLI configure
-        uses: azure/CLI@v1
+      - name: Login Azure CLI
+        uses: azure/login@v1
         with:
-          azcliversion: 2.30.0
-          inlineScript: |
-            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
-            az account set --subscription $ARM_SUBSCRIPTION_ID
-            az account show
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to ghcr.io
         run: |
@@ -108,21 +99,12 @@ jobs:
     needs: CreateAzureAppServiceWebAppForContainers
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'dockerhub' }}
     runs-on: ubuntu-22.04
-    env:
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
     steps:
-      - name: Azure CLI configure
-        uses: azure/CLI@v1
+      - name: Login Azure CLI
+        uses: azure/login@v1
         with:
-          azcliversion: 2.30.0
-          inlineScript: |
-            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
-            az account set --subscription $ARM_SUBSCRIPTION_ID
-            az account show
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to dockerhub
         run: |
@@ -139,14 +121,10 @@ jobs:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'azurecr.io' }}
     runs-on: ubuntu-22.04
     steps:
-      - name: Azure CLI configure
-        uses: azure/CLI@v1
+      - name: Login Azure CLI
+        uses: azure/login@v1
         with:
-          azcliversion: 2.30.0
-          inlineScript: |
-            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
-            az account set --subscription $ARM_SUBSCRIPTION_ID
-            az account show
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to ACR
         run: |
