@@ -127,9 +127,11 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to ACR
-        run: |
-          export CR_PAT=${{ secrets.AZURE_CONTAINER_REGISTRY_TOKEN }}
-          echo $CR_PAT | docker login ${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io -u ${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }} --password-stdin
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io
+          username: ${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_CONTAINER_REGISTRY_TOKEN }}
 
       - uses: azure/webapps-deploy@v2
         with:
