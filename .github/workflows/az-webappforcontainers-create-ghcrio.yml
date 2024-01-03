@@ -1,4 +1,4 @@
-name: Create Azure App Service (Web App for Containers)
+name: (ghcr.io) Create Azure App Service (Web App for Containers)
 
 on:
   workflow_dispatch:
@@ -21,12 +21,9 @@ on:
         type: choice
         options:
           - 'ghcr.io'
-          - 'dockerhub'
-          - 'azurecr.io'
       CONTAINER_IMAGE_TAG:
         description: 'Container Image Tag'
         required: true
-
 
 jobs:
   CreateAzureAppServiceWebAppForContainers:
@@ -45,6 +42,10 @@ jobs:
       TF_VAR_AZURE_ASP_SO: ${{ vars.AZURE_ASP_SO }}
       TF_VAR_AZURE_ASP_SKU_SIZE: ${{ github.event.inputs.AZURE_ASP_SKU_SIZE }}
       TF_VAR_AZURE_APP_NAME: ${{ github.event.inputs.AZURE_APP_NAME }}
+
+      TF_VAR_DOCKER_REGISTRY_SERVER_URL: 'https://ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}'
+      TF_VAR_DOCKER_REGISTRY_SERVER_USERNAME: ${{ vars.CONTAINER_REGISTRY_USERNAME }}
+      TF_VAR_DOCKER_REGISTRY_SERVER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout
@@ -94,46 +95,3 @@ jobs:
         with:
           app-name: ${{ github.event.inputs.AZURE_APP_NAME }}
           images: 'ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
-
-  DeployDockerHub:
-    needs: CreateAzureAppServiceWebAppForContainers
-    if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'dockerhub' }}
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Login Azure CLI
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Login to dockerhub
-        run: |
-          export CR_PAT=${{ secrets.DOCKERHUB_TOKEN }}
-          echo $CR_PAT | docker login -u ${{ vars.CONTAINER_REGISTRY_USERNAME }} --password-stdin 'docker.io'
-
-      - uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ github.event.inputs.AZURE_APP_NAME }}
-          images: '${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
-
-  DeployAzureContainerRegistry:
-    needs: CreateAzureAppServiceWebAppForContainers
-    if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'azurecr.io' }}
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Login Azure CLI
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Login to ACR
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io
-          username: ${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}
-          password: ${{ secrets.AZURE_CONTAINER_REGISTRY_TOKEN }}
-
-      - uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ github.event.inputs.AZURE_APP_NAME }}
-          images: '${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io/${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'

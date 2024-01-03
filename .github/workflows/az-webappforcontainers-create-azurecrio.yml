@@ -1,0 +1,99 @@
+name: (azurecr.io) Create Azure App Service (Web App for Containers)
+
+on:
+  workflow_dispatch:
+    inputs:
+      AZURE_RG:
+        description: 'Azure Resource Group'
+        required: true
+      AZURE_ASP_NAME:
+        description: 'Azure App Service Plan Name'
+        required: true
+      AZURE_ASP_SKU_SIZE:
+        description: 'Azure App Service Plan SKU Size'
+        required: true
+      AZURE_APP_NAME:
+        description: 'Azure App Service Name (Web App)'
+        required: true
+      CONTAINER_REGISTRY_SELECTED:
+        description: 'Select Container Registry'
+        required: true
+        type: choice
+        options:
+          - 'azurecr.io'
+      CONTAINER_IMAGE_TAG:
+        description: 'Container Image Tag'
+        required: true
+
+jobs:
+  CreateAzureAppServiceWebAppForContainers:
+    runs-on: ubuntu-22.04
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+      TF_VAR_AZURE_LOCATION: ${{ vars.AZURE_LOCATION}}
+      TF_VAR_AZURE_RG: ${{ github.event.inputs.AZURE_RG }}
+      TF_VAR_AZURE_SA_NAME: ${{ github.event.inputs.AZURE_SA_NAME }}
+      TF_VAR_AZURE_SA_CONTAINER_NAME: ${{ github.event.inputs.AZURE_SA_CONTAINER_NAME }}
+      TF_VAR_AZURE_ASP_NAME: ${{ github.event.inputs.AZURE_ASP_NAME }}
+      TF_VAR_AZURE_ASP_SO: ${{ vars.AZURE_ASP_SO }}
+      TF_VAR_AZURE_ASP_SKU_SIZE: ${{ github.event.inputs.AZURE_ASP_SKU_SIZE }}
+      TF_VAR_AZURE_APP_NAME: ${{ github.event.inputs.AZURE_APP_NAME }}
+
+      TF_VAR_DOCKER_REGISTRY_SERVER_URL: 'https://${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io'
+      TF_VAR_DOCKER_REGISTRY_SERVER_USERNAME: ${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}
+      TF_VAR_DOCKER_REGISTRY_SERVER_PASSWORD: ${{ secrets.AZURE_CONTAINER_REGISTRY_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure CLI configure
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+            az account set --subscription $ARM_SUBSCRIPTION_ID
+            az account show
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan
+
+      - name: Show outputs
+        run: terraform show
+
+  DeployAzureContainerRegistry:
+    needs: CreateAzureAppServiceWebAppForContainers
+    if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'azurecr.io' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Login Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io
+          username: ${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_CONTAINER_REGISTRY_TOKEN }}
+
+      - uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ github.event.inputs.AZURE_APP_NAME }}
+          slot-name: 'production'
+          images: '${{ vars.AZURE_CONTAINER_REGISTRY_NAME}}.azurecr.io/${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'

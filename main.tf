@@ -21,6 +21,21 @@ variable "AZURE_APP_NAME" {
   type = string
 }
 
+variable "DOCKER_REGISTRY_SERVER_URL" {
+  type = string
+  default = ""
+}
+
+variable "DOCKER_REGISTRY_SERVER_USERNAME" {
+  type = string
+  default = ""
+}
+
+variable "DOCKER_REGISTRY_SERVER_PASSWORD" {
+  type = string
+  default = ""
+}
+
 # Configure the Azure provider
 provider "azurerm" {
   features {}
@@ -47,6 +62,9 @@ resource "azurerm_linux_web_app" "app_service" {
 
   app_settings = {
     "WEBSITES_PORT" = "8080"
+    "DOCKER_REGISTRY_SERVER_URL" = var.DOCKER_REGISTRY_SERVER_URL
+    "DOCKER_REGISTRY_SERVER_USERNAME" = var.DOCKER_REGISTRY_SERVER_USERNAME
+    "DOCKER_REGISTRY_SERVER_PASSWORD" = var.DOCKER_REGISTRY_SERVER_PASSWORD
   }
 
   site_config {
