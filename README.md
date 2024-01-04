@@ -7,26 +7,21 @@ Template Java Gradle para GitHub Actions, com as configurações de:
 - Docker (build, trivy scan, push) - _ghcr.io, dockerhub, azurecr.io_
 - Terraform (Azure Web App for Containers)
 
-A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-and-play com a pipeline descrita anteriormente.
+A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-and-play com a pipeline proposta.
 
 # Sobre
 
+## Pipeline
+
 ![template-hld](./screenshots/template-hld.png)
 
+# Menu
 
-# Status Badges
-
-[![Build](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/build.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/build.yml)
-
-[![Build and Tests](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/build-and-tests.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/build-and-tests.yml)
-
-[![SonarQube](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/sonarqube.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/sonarqube.yml)
-
-[![Docker](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/docker.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/docker.yml)
-
-[![Create Azure App Service (Web App for Containers)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create.yml)
-
-[![Destroy Azure App Service (Web App for Containers)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-destroy.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-destroy.yml)
+- [Sobre](#sobre)
+- [Tecnologias](#tecnologias)
+- [Workflows Status](#workflows-status)
+- [Instalação](#instalação)
+  - [GitHub Actions (Secrets e Variables)](#github-actions-secrets-e-variables)
 
 # Tecnologias
 
@@ -34,17 +29,45 @@ A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-
 - Gradle
 - Spring Boot
 - GitHub Actions
-- SonarQube (9.9-community)
+- SonarQube
 - Docker
 - Aqua Trivy
+- Copacetic (apenas para ghcr.io)
 - Terraform
 - Azure (Web App for Containers)
 
-# GitHub Actions 
 
-## Secrets e Variables
+# Workflows Status
 
-Criar as seguintes Secrets e Variables no GitHub:
+## Build e Testes
+
+[![Build](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/build.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/build.yml)
+
+[![Build and Tests](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/build-and-tests.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/build-and-tests.yml)
+
+## SonarQube 
+[![SonarQube](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/sonarqube.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/sonarqube.yml)
+
+## Docker
+
+[![Docker](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/docker.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/docker.yml)
+
+## Terraform
+
+[![(azurecr.io) Create Azure App Service (Web App for Containers)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create-azurecrio.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create-azurecrio.yml)
+
+[![(docker.io) Create Azure App Service (Web App for Containers)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create-dockerhub.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create-dockerhub.yml)
+
+[![(ghcr.io) Create Azure App Service (Web App for Containers)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create-ghcrio.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-create-ghcrio.yml)
+
+[![Destroy Azure App Service (Web App for Containers)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-destroy.yml/badge.svg)](https://github.com/rapharw/ghactions-java-gradle-webappforcontainers/actions/workflows/az-webappforcontainers-destroy.yml)
+
+
+# Instalação
+
+## GitHub Actions (Secrets e Variables)
+
+Criar as seguintes _Secrets_ e _Variables_ no **GitHub**:
 
 ![secrets.png](screenshots/secrets.png)
 
@@ -54,19 +77,25 @@ Criar as seguintes Secrets e Variables no GitHub:
 
 ## SonarQube
 
-Configurar o `SONARQUBE_HOST` e `SONARQUBE_API_TOKEN` habilitará a aplicação de submeter para scan de anáise de código.
+Configurar as _Secrets_ `SONARQUBE_HOST` e `SONARQUBE_API_TOKEN` habilitará o scan de anáise de código.
 
-## Workflows
+**OBS**: Necessário criar o arquivo `sonar-project.properties`, para que o SonarQube funcione devidamente.
 
-**OBS**: Para criar um novo workflow, basta criar um arquivo `.yml` na pasta `.github/workflows/` do seu repositório, e configurá-lo apropriadamente.
+## GitHub Workflow Permissions (Actions)
+
+Habilitar esta opção para que o `GITHUB_TOKEN` possua acesso dentro da pipeline. 
+
+![docker-workflow-permissions.png](./screenshots/docker-workflow-permissions.png)
+
+## Workflows - TD;DR
 
 A seguir encontram-se os workflows existentes.
 
-### Build
+#### Build
 
 Arquivo `build.yml`
 
-### Build e Testes com Coverage
+#### Build e Testes com Coverage
 
 Arquivo `build-and-tests.yml`
 
@@ -74,7 +103,7 @@ Arquivo `build-and-tests.yml`
 
 - JaCoCo Report Tests configurado (ver `build.gradle`)
 
-### Build, Testes com Coverage e SonarQube
+#### Build, Testes com Coverage e SonarQube
 
 Arquivo `sonarqube.yml`
 
@@ -84,9 +113,17 @@ Arquivo `sonarqube.yml`
 - Secrets configuradas (`SONARQUBE_API_TOKEN`, `SONARQUBE_HOST`)
 - Arquivo `sonar-project.properties` configurado
 
-### Build e Docker (Login, Build, Scan - _Aqua Trivy_, e Push)
+#### Build e Docker (Login, Build, Scan - _Aqua Trivy_, e Push)
 
-Este exemplo utiliza `CONTAINER REGISTRY` dos providers abaixo, para armazenamento das imagens de container:
+Utiliza-se de `CONTAINER REGISTRY` dos providers _ghcr.io, dockerhub, azurecr.io_, para armazenamento das imagens de container:
+
+###### Workflow execution
+
+Ao executar o workflow `Docker`, selecione qual `Container Registry` será armazenada a imagem de container: 
+
+![workflows-docker-inputs.png](./screenshots/workflows-docker-inputs.png)
+
+###### Resultado 
 
 - GitHub (`ghcr.io`)
    ![container-registry-github.png](./screenshots/container-registry-github.png)
@@ -95,9 +132,9 @@ Este exemplo utiliza `CONTAINER REGISTRY` dos providers abaixo, para armazenamen
 - Azure (`azurecr.io`)
    ![container-registry-acr.png](./screenshots/container-registry-acr.png)
 
-#### Habilitar Workflow Permissions
+#### Ver mais
 
-![docker-workflow-permissions.png](./screenshots/docker-workflow-permissions.png)
+Para criar um novo workflow, basta criar um arquivo `.yml` na pasta `.github/workflows/` do seu repositório, e configurá-lo apropriadamente.
 
 ### Terraform (Criar e Destruir Azure Web App for Containers)
 
@@ -105,8 +142,7 @@ Para executar o workflow de criação IaC, informar os seguintes inputs:
 
 ![workflow-tf-azure.png](./screenshots/workflow-tf-azure.png)
 
-
-## Status Badge (workflows)
+### Criar Status Badge (workflows)
 
 Para criar um status badge, siga os passos abaixo, e inclua o código gerado no seu `README.md`
 

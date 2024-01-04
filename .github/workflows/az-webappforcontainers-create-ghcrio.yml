@@ -51,14 +51,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Azure CLI configure
-        uses: azure/CLI@v1
+      - name: Login Azure CLI
+        uses: azure/login@v1
         with:
-          azcliversion: 2.30.0
-          inlineScript: |
-            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
-            az account set --subscription $ARM_SUBSCRIPTION_ID
-            az account show
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+#      - name: Azure CLI configure
+#        uses: azure/CLI@v1
+#        with:
+#          azcliversion: 2.30.0
+#          inlineScript: |
+#            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+#            az account set --subscription $ARM_SUBSCRIPTION_ID
+#            az account show
 
       - name: Terraform init
         run: terraform init
