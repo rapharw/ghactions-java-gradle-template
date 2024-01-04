@@ -6,6 +6,7 @@ Template Java Gradle para GitHub Actions, com as configurações de:
 - Análise de SonarQube
 - Docker (build, trivy scan, push) - _ghcr.io, dockerhub, azurecr.io_
 - Terraform (Azure Web App for Containers)
+- (Extra) Copacetic - _container patch for **ghcr.io**_
 
 A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-and-play com a pipeline proposta.
 
@@ -65,37 +66,67 @@ A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-
 
 # Instalação
 
+## Necessário
+
+- Instância do SonarQube ativa (_Obter o `host` e `token de acesso`_)
+- Conta Azure com Subscription ativa
+- Instância de Container Registry ativa (_No caso do `ghcr.io` e `dockerhub`, utiliza-se do próprio provedor. Já o `azurecr.io`, é necessário criar previamente um `ACR`._)
+
 ## GitHub Actions (Secrets e Variables)
 
 Criar as seguintes _Secrets_ e _Variables_ no **GitHub**:
 
 ![secrets.png](screenshots/secrets.png)
 
+```properties
+AZURE_CONTAINER_REGISTRY_TOKEN=<acr-password>
+AZURE_CREDENTIALS=<json-with-service-principal-informations>
+# place this with the right values
+# {
+#   "clientId": "<app-id>",
+#   "clientSecret": "<secret-value>",
+#   "subscriptionId": "<subscription-id>",
+#   "tenantId": "<tenant-id>",
+# }
+DOCKERHUB_TOKEN=<dockerhub-access-token>
+SONARQUBE_API_TOKEN=<sonarqube-access-token>
+SONARQUBE_HOST=<sonarqube-host>
+```
+
 ![variables.png](screenshots/variables.png)
 
-**OBS**: Desta forma, a solução estará apta a executar todo fluxo de pipeline proposto.
+```properties
+AZURE_ASP_SO=<so-type> # Linux
+AZURE_CONTAINER_REGISTRY_NAME=<acr-server-name>
+AZURE_CONTAINER_REGISTRY_USERNAME=<acr-admin-username>
+AZURE_LOCATION=<azure-location> # eastus2
+CONTAINER_REGISTRY_REPO_NAME=<container-registry-repository-name>
+CONTAINER_REGISTRY_USERNAME=<container-registry-username-or-organization>
+```
 
 ## SonarQube
 
-Configurar as _Secrets_ `SONARQUBE_HOST` e `SONARQUBE_API_TOKEN` habilitará o scan de anáise de código.
-
-**OBS**: Necessário criar o arquivo `sonar-project.properties`, para que o SonarQube funcione devidamente.
+Necessário criar o arquivo `sonar-project.properties` para que o SonarQube funcione devidamente.
 
 ## GitHub Workflow Permissions (Actions)
 
-Habilitar esta opção para que o `GITHUB_TOKEN` possua acesso dentro da pipeline. 
+Habilitar as permissões de leitura e escrita para `secrets.GITHUB_TOKEN`  
 
 ![docker-workflow-permissions.png](./screenshots/docker-workflow-permissions.png)
 
-## Workflows - TD;DR
+## Conclusão da instalação
+
+Desta forma, a solução estará apta a executar todo fluxo de pipeline proposto [em Pipeline](#pipeline)
+
+# Workflows - TD;DR
 
 A seguir encontram-se os workflows existentes.
 
-#### Build
+## Build
 
 Arquivo `build.yml`
 
-#### Build e Testes com Coverage
+## Build e Testes com Coverage
 
 Arquivo `build-and-tests.yml`
 
@@ -103,7 +134,7 @@ Arquivo `build-and-tests.yml`
 
 - JaCoCo Report Tests configurado (ver `build.gradle`)
 
-#### Build, Testes com Coverage e SonarQube
+## Build, Testes com Coverage e SonarQube
 
 Arquivo `sonarqube.yml`
 
@@ -113,17 +144,17 @@ Arquivo `sonarqube.yml`
 - Secrets configuradas (`SONARQUBE_API_TOKEN`, `SONARQUBE_HOST`)
 - Arquivo `sonar-project.properties` configurado
 
-#### Build e Docker (Login, Build, Scan - _Aqua Trivy_, e Push)
+## Build e Docker (Login, Build, Scan - _Aqua Trivy_, e Push)
 
 Utiliza-se de `CONTAINER REGISTRY` dos providers _ghcr.io, dockerhub, azurecr.io_, para armazenamento das imagens de container:
 
-###### Workflow execution
+### Workflow execution
 
 Ao executar o workflow `Docker`, selecione qual `Container Registry` será armazenada a imagem de container: 
 
 ![workflows-docker-inputs.png](./screenshots/workflows-docker-inputs.png)
 
-###### Resultado 
+#### Resultado 
 
 - GitHub (`ghcr.io`)
    ![container-registry-github.png](./screenshots/container-registry-github.png)
@@ -142,9 +173,11 @@ Para executar o workflow de criação IaC, informar os seguintes inputs:
 
 ![workflow-tf-azure.png](./screenshots/workflow-tf-azure.png)
 
-### Criar Status Badge (workflows)
+Com isso, a infra será criada na cloud Azure, bem como o deploy do Web App for Containers.
 
-Para criar um status badge, siga os passos abaixo, e inclua o código gerado no seu `README.md`
+# Criar Status Badge dos workflows
+
+Para criar um status badge, siga os passos abaixo, e inclua o código gerado no seu `README.md` (na área de [Workflow Status](#workflows-status))
 
 1. Crie uma status badge
 
