@@ -6,7 +6,6 @@ Template Java Gradle para GitHub Actions, com as configurações de:
 - Análise de SonarQube
 - Docker (build, trivy scan, push) - _ghcr.io, dockerhub, azurecr.io_
 - Terraform (Azure Web App for Containers)
-- (Extra) Copacetic - _container patch for **ghcr.io**_
 
 A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-and-play com a pipeline proposta.
 
@@ -23,6 +22,12 @@ A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-
 - [Workflows Status](#workflows-status)
 - [Instalação](#instalação)
   - [GitHub Actions (Secrets e Variables)](#github-actions-secrets-e-variables)
+  - [SonarQube](#sonarqube)
+  - [GitHub Workflows Permissions](#github-workflow-permissions-actions)
+  - [Conclusão](#conclusão-da-instalação)
+- [Workflows - TL;DR](#workflows---tddr)
+- [Como criar Status Badges](#criar-status-badge-dos-workflows)
+  
 
 # Tecnologias
 
@@ -33,7 +38,6 @@ A ideia deste template é tornar uma aplicação Java Gradle (Spring Boot) plug-
 - SonarQube
 - Docker
 - Aqua Trivy
-- Copacetic (apenas para ghcr.io)
 - Terraform
 - Azure (Web App for Containers)
 
@@ -79,15 +83,19 @@ Criar as seguintes _Secrets_ e _Variables_ no **GitHub**:
 ![secrets.png](screenshots/secrets.png)
 
 ```properties
-AZURE_CONTAINER_REGISTRY_TOKEN=<acr-password>
+AZURE_CLIENT_ID=<app-id>
+AZURE_CLIENT_SECRET=<secret-value>
+AZURE_SUBSCRIPTION_ID=<subscription-id>
+AZURE_TENANT_ID=<tenant-id>
 AZURE_CREDENTIALS=<json-with-service-principal-informations>
-# place this with the right values
+# place this json with the right values
 # {
 #   "clientId": "<app-id>",
 #   "clientSecret": "<secret-value>",
 #   "subscriptionId": "<subscription-id>",
 #   "tenantId": "<tenant-id>",
 # }
+AZURE_CONTAINER_REGISTRY_TOKEN=<acr-password>
 DOCKERHUB_TOKEN=<dockerhub-access-token>
 SONARQUBE_API_TOKEN=<sonarqube-access-token>
 SONARQUBE_HOST=<sonarqube-host>
@@ -101,7 +109,8 @@ AZURE_CONTAINER_REGISTRY_NAME=<acr-server-name>
 AZURE_CONTAINER_REGISTRY_USERNAME=<acr-admin-username>
 AZURE_LOCATION=<azure-location> # eastus2
 CONTAINER_REGISTRY_REPO_NAME=<container-registry-repository-name>
-CONTAINER_REGISTRY_USERNAME=<container-registry-username-or-organization>
+DOCKERHUB_REGISTRY_USERNAME=<dockerhub-container-registry-username-or-organization>
+GH_CONTAINER_REGISTRY_USERNAME=<github-container-registry-username-or-organization>
 ```
 
 ## SonarQube
