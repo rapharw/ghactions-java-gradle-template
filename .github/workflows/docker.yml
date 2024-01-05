@@ -61,45 +61,26 @@ jobs:
       - name: Login to ghcr.io
         run: |
           export CR_PAT=${{ secrets.GITHUB_TOKEN }}
-          echo $CR_PAT | docker login ghcr.io -u ${{ vars.CONTAINER_REGISTRY_USERNAME }} --password-stdin
+          echo $CR_PAT | docker login ghcr.io -u ${{ vars.GH_CONTAINER_REGISTRY_USERNAME }} --password-stdin
 
       - name: Build Docker Image
         run: |
-          docker build --build-arg JAR_FILE='build/libs/*.jar' -t ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }} .
-
-      - name: Push Docker Image to Registry
-        run: |
-          docker push ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}
+          docker build --build-arg JAR_FILE='build/libs/*.jar' -t ghcr.io/${{ vars.GH_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }} .
 
       - name: Aqua Trivy (Container Image Scan)
         uses: aquasecurity/trivy-action@0.14.0
         with:
-          image-ref: 'ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
+          image-ref: 'ghcr.io/${{ vars.GH_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
           scan-type: 'image'
-          format: 'json'
-          output: 'trivy-report.json'
+          format: 'table'
           exit-code: '1'
           ignore-unfixed: true
-          vuln-type: 'os'
+          vuln-type: 'os,library'
 
-      - name: Check Vuln Count
+      - name: Push Docker Image to Registry
         run: |
-          report_file="trivy-report.json"
-          vuln_count=$(jq '.Results | length' "$report_file")
-          echo "vuln_count=$vuln_count" >> $GITHUB_OUTPUT
+          docker push ghcr.io/${{ vars.GH_CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}
 
-      - name: Copacetic Action
-        uses: project-copacetic/copa-action@v1.0.1
-        with:
-          image: 'ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
-          image-report: 'trivy-report.json'
-          patched-tag: '${{ github.event.inputs.CONTAINER_IMAGE_TAG }}-patched'
-          buildkit-version: 'v0.11.6'
-          copa-version: '0.4.1'
-
-      - name: Push Docker Image Patched to Registry
-        run: |
-          docker push ghcr.io/${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}-patched
 
   DockerHub:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'dockerhub' }}
@@ -123,29 +104,25 @@ jobs:
       - name: Login to dockerhub
         run: |
           export CR_PAT=${{ secrets.DOCKERHUB_TOKEN }}
-          echo $CR_PAT | docker login -u ${{ vars.CONTAINER_REGISTRY_USERNAME }} --password-stdin 'docker.io'
+          echo $CR_PAT | docker login -u ${{ vars.DOCKERHUB_REGISTRY_USERNAME }} --password-stdin 'docker.io'
 
       - name: Build Docker Image
         run: |
-          docker build --build-arg JAR_FILE='build/libs/*.jar' -t '${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}' .
+          docker build --build-arg JAR_FILE='build/libs/*.jar' -t '${{ vars.DOCKERHUB_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}' .
 
       - name: Aqua Trivy (Container Image Scan)
         uses: aquasecurity/trivy-action@0.14.0
         with:
-          image-ref: '${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
+          image-ref: '${{ vars.DOCKERHUB_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
           scan-type: 'image'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
-          vuln-type: 'os'
-
-      - name: Copacetic Action
-        run: | 
-          echo "No copa execution for dockerhub"
+          vuln-type: 'os,library'
 
       - name: Push Docker Image to Registry
         run: |
-          docker push '${{ vars.CONTAINER_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
+          docker push '${{ vars.DOCKERHUB_REGISTRY_USERNAME }}/${{ vars.CONTAINER_REGISTRY_REPO_NAME }}:${{ github.event.inputs.CONTAINER_IMAGE_TAG }}'
 
   AzureContainerRegistry:
     if: ${{ github.event.inputs.CONTAINER_REGISTRY_SELECTED == 'azurecr.io' }}
@@ -183,11 +160,7 @@ jobs:
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
-          vuln-type: 'os'
-
-      - name: Copacetic Action
-        run: |
-          echo "No copa execution for azurecr.io"
+          vuln-type: 'os,library'
 
       - name: Push Docker Image to Registry
         run: |

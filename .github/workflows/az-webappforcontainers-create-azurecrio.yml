@@ -29,6 +29,11 @@ jobs:
   CreateAzureAppServiceWebAppForContainers:
     runs-on: ubuntu-22.04
     env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
       TF_VAR_AZURE_LOCATION: ${{ vars.AZURE_LOCATION}}
       TF_VAR_AZURE_RG: ${{ github.event.inputs.AZURE_RG }}
       TF_VAR_AZURE_SA_NAME: ${{ github.event.inputs.AZURE_SA_NAME }}
@@ -46,10 +51,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login Azure CLI
-        uses: azure/login@v1
+      - name: Azure CLI configure
+        uses: azure/CLI@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          azcliversion: 2.30.0
+          inlineScript: |
+            az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+            az account set --subscription $ARM_SUBSCRIPTION_ID
+            az account show
 
       - name: Terraform init
         run: terraform init
